@@ -1,98 +1,102 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { User, Lock, Avatar, PhoneFilled, Postcard } from '@element-plus/icons-vue'
-import { RouterLink, RouterView } from 'vue-router'
-import { ElMessage } from 'element-plus';
+    import { ref } from 'vue';
+    import { User, Lock, Avatar, PhoneFilled, Postcard } from '@element-plus/icons-vue'
+    import { ElMessage } from 'element-plus';
 
-const isRegister = ref(false);
+    const isRegister = ref(false);
 
-//定义数据模型
-const registerData = ref({
-    username:'',
-    password:'',
-    rePassword:'',
-    FullName:'',
-    DocumentType:'',
-    DocumentID:'',
-    phoneNumber:'',
-})
+    //定义数据模型
+    const registerData = ref({
+        username:'',
+        password:'',
+        rePassword:'',
+        FullName:'',
+        DocumentType:'',
+        DocumentID:'',
+        phoneNumber:'',
+    })
 
-const loginData = ref({
-    username:'',
-    password:'',
-})
+    const loginData = ref({
+        username:'',
+        password:'',
+    })
 
-//表单数据校验规则
-const rules = {
-    username: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
-        { max: 10, message: '用户名过长', trigger: 'blur' },
-    ],
-    password: [
-        { required: true, message: '请输入密码', trigger: 'blur' },
-        { 
-            pattern: /^(?=.*\d.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{6,}$/, 
-            message: '密码至少6位，包含至少两个数字，并且不能全为大写或小写字母', 
-            trigger: 'blur' 
-        },
-    ],
-    rePassword: [
-        { required: true, message: '请确认密码', trigger: 'blur' },
-        {
-            validator: (rule: any, value: string, callback: Function) => {
-                if (!value) {
-                    callback(new Error('请再次输入密码'));
-                } else if (value !== registerData.value.password) {
-                    callback(new Error('两次输入的密码不一致'));
-                } else {
-                    callback();
-                }
+    //表单数据校验规则
+    const rules = {
+        username: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+            { max: 10, message: '用户名过长', trigger: 'blur' },
+        ],
+        password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { 
+                pattern: /^(?=.*\d.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{6,}$/, 
+                message: '密码至少6位，包含至少两个数字，并且不能全为大写或小写字母', 
+                trigger: 'blur' 
             },
-            trigger: 'blur',
-        },
-    ],
-    FullName: [
-        { required: true, message: '请输入姓名', trigger: 'blur' },
-    ],
-    DocumentType: [
-        { required: true, message: '请选择证件类型', trigger: 'blur' },
-    ],
-    DocumentID: [
-        { required: true, message: '请输入证件号码', trigger: 'blur' },
-    ],
-    phoneNumber: [
-        { required: true, message: '请输入手机号码', trigger: 'blur' },
-        { 
-            pattern: /^\d{11}$/, 
-            message: '手机号码必须为11位数字', 
-            trigger: 'blur' 
-        },
-    ],
-};
+        ],
+        rePassword: [
+            { required: true, message: '请确认密码', trigger: 'blur' },
+            {
+                validator: (rule: any, value: string, callback: Function) => {
+                    if (!value) {
+                        callback(new Error('请再次输入密码'));
+                    } else if (value !== registerData.value.password) {
+                        callback(new Error('两次输入的密码不一致'));
+                    } else {
+                        callback();
+                    }
+                },
+                trigger: 'blur',
+            },
+        ],
+        FullName: [
+            { required: true, message: '请输入姓名', trigger: 'blur' },
+        ],
+        DocumentType: [
+            { required: true, message: '请选择证件类型', trigger: 'blur' },
+        ],
+        DocumentID: [
+            { required: true, message: '请输入证件号码', trigger: 'blur' },
+        ],
+        phoneNumber: [
+            { required: true, message: '请输入手机号码', trigger: 'blur' },
+            { 
+                pattern: /^\d{11}$/, 
+                message: '手机号码必须为11位数字', 
+                trigger: 'blur' 
+            },
+        ],
+    };
 
 
-const loginrules = {
-    username: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
-    ],
-    password: [
-        { required: true, message: '请输入密码', trigger: 'blur' },
-    ],
-};
+    const loginrules = {
+        username: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+        ],
+        password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+        ],
+    };
 
 
-//调用后台接口注册
-import {userRegisterService, userLoginService} from '@/api/user'
+    //调用后台接口注册
+    import {userRegisterService, userLoginService} from '@/api/user'
 
-const register = async()=>{
-    let result = await userRegisterService(registerData.value);
-    ElMessage.success(result.msg?result.msg:'注册成功')
-}
+    const register = async()=>{
+        let result = await userRegisterService(registerData.value);
+        ElMessage.success(result.msg?result.msg:'注册成功')
+    }
 
-const login = async()=>{
-    let result = await userLoginService(loginData.value);
-    ElMessage.success(result.msg?result.msg:'登录成功');
-}
+    //路由用
+    import { useRouter } from 'vue-router'
+    const router = useRouter()
+    //调用后台接口登录
+    const login = async()=>{
+        let result = await userLoginService(loginData.value);
+        ElMessage.success(result.msg?result.msg:'登录成功');
+        router.push('/')
+    }
 
 </script>
 
