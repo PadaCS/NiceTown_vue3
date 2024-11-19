@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { User, Lock, Avatar, PhoneFilled, Postcard } from '@element-plus/icons-vue'
 import { RouterLink, RouterView } from 'vue-router'
+import { ElMessage } from 'element-plus';
 
 const isRegister = ref(false);
 
@@ -85,22 +86,12 @@ import {userRegisterService, userLoginService} from '@/api/user'
 
 const register = async()=>{
     let result = await userRegisterService(registerData.value);
-    if(result.code == 0){
-        // 返回的result有值的话直接用，没有的话就提示“注册成功”
-        alert(result.msg?result.msg:'注册成功');
-    }else{
-        alert(result.msg?result.msg:'注册失败')
-    }
+    ElMessage.success(result.msg?result.msg:'注册成功')
 }
 
 const login = async()=>{
     let result = await userLoginService(loginData.value);
-    if(result.code == 0){
-        // 返回的result有值的话直接用，没有的话就提示“注册成功”
-        alert(result.msg?result.msg:'登录成功');
-    }else{
-        alert(result.msg?result.msg:'登录失败')
-    }
+    ElMessage.success(result.msg?result.msg:'登录成功');
 }
 
 </script>
