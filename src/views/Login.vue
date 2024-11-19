@@ -79,6 +79,21 @@
         ],
     };
 
+    //身份证明类型选项
+    const options = [
+    {
+        value: '身份证',
+        label: '身份证',
+    },
+    {
+        value: '护照',
+        label: '护照',
+    },
+    {
+        value: '其它',
+        label: '其它',
+    },
+    ]
 
     //调用后台接口注册
     import {userRegisterService, userLoginService} from '@/api/user'
@@ -122,7 +137,13 @@
                     <el-input :prefix-icon="Avatar" placeholder="请输入姓名" v-model="registerData.FullName"></el-input>
                 </el-form-item>
                 <el-form-item prop="DocumentType">
-                    <el-input :prefix-icon="Postcard" placeholder="请选择证件类型" v-model="registerData.DocumentType"></el-input>
+                    <!-- <el-input :prefix-icon="Postcard" placeholder="请选择证件类型" v-model="registerData.DocumentType"></el-input> -->
+                    <el-select :prefix-icon="Postcard" placeholder="请选择证件类型" v-model="registerData.DocumentType">
+                        <el-option v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"/>
+                    </el-select>
                 </el-form-item >
                 <el-form-item prop="DocumentID">
                     <el-input :prefix-icon="Postcard" placeholder="请输入证件号码" v-model="registerData.DocumentID"></el-input>
