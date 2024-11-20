@@ -2,7 +2,7 @@ export interface Promote {
     promoteID: number;
     promotterID: number;
     townID: number;
-    townFullName:any;
+    townFullName:any;//用来存乡镇全名
     promoteType?: string; // 可选属性
     theme: string;
     description: string;

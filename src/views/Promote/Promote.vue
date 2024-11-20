@@ -9,6 +9,27 @@
     } from '@element-plus/icons-vue'
 
     // ———————————————————————————————————————————————————————————
+    // ——————————————————————分页展示相关功能——————————————————————
+    // ———————————————————————————————————————————————————————————
+
+    //分页条数据模型
+    const pageNum = ref(1)//当前页
+    const total = ref(20)//总条数
+    const pageSize = ref(6)//每页条数
+
+    //当每页条数发生了变化，调用此函数
+    const onSizeChange =async (size:number) => {
+        pageSize.value = size
+        search()
+    }
+    //当前页码发生变化，调用此函数
+    const onCurrentChange = (num:number) => {
+        pageNum.value = num
+        search()
+    }
+
+
+    // ———————————————————————————————————————————————————————————
     // ——————————————————————数据回显相关功能——————————————————————
     // ———————————————————————————————————————————————————————————
 
@@ -23,8 +44,7 @@
         console.log('promoteList被调用了')
         isPromoter.value = false;
         // 之后要写成带页码参数的形式
-        let result = await promoteListService({pageNum:1, pageSize:10});
-        // let result = await promoteListService({pageNum:1, pageSize:5, promoteType:'农家院'});
+        let result = await promoteListService({pageNum:pageNum.value, pageSize:pageSize.value});
         promotes.value = result.data.items || [];
         total.value = result.data.total || 0;
         
@@ -74,8 +94,8 @@
         //清空一下数据
         clear()
 
-        // 之后要写成带页码参数的形式
-        let result = await viewMyService({pageNum:1, pageSize:10});
+
+        let result = await viewMyService({pageNum:pageNum.value, pageSize:pageSize.value});
         // let result = await promoteListService({pageNum:1, pageSize:5, promoteType:'农家院'});
         promotes.value = result.data.items || [];
         total.value = result.data.total || 0;
@@ -139,9 +159,9 @@
         // 判断是否为"我的"页面
         let result
         if(isPromoter.value == false){
-            result = await promoteListService({pageNum:1, pageSize:10, promoteType:getCategoryNameById(categoryId.value)});
+            result = await promoteListService({pageNum:pageNum.value, pageSize:pageSize.value, promoteType:getCategoryNameById(categoryId.value)});
         }else{
-            result = await viewMyService({pageNum:1, pageSize:10, promoteType:getCategoryNameById(categoryId.value)});
+            result = await viewMyService({pageNum:pageNum.value, pageSize:pageSize.value, promoteType:getCategoryNameById(categoryId.value)});
         }
 
         promotes.value = result.data.items || [];
@@ -158,32 +178,11 @@
             promote.townFullName = town ? `${town.province}${town.city}${town.name}` : '未知乡镇';
         });
         console.log('result:\n' + promotes.value)
-
-        //清空一下数据
-        clear()
     }
 
 
     const clear = () => {
         categoryId.value = ''
-    }
-
-    // ———————————————————————————————————————————————————————————
-    // ——————————————————————分页展示相关功能——————————————————————
-    // ———————————————————————————————————————————————————————————
-
-    //分页条数据模型
-    const pageNum = ref(1)//当前页
-    const total = ref(20)//总条数
-    const pageSize = ref(6)//每页条数
-
-    //当每页条数发生了变化，调用此函数
-    const onSizeChange = (size:number) => {
-        pageSize.value = size
-    }
-    //当前页码发生变化，调用此函数
-    const onCurrentChange = (num:number) => {
-        pageNum.value = num
     }
 
 
