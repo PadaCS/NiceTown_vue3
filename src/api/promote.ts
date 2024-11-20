@@ -8,3 +8,13 @@ export const promoteListService = (
     // 返回 GET 请求
   return request.get('/promote/list', {params});
 };
+
+
+import type { Promote } from '@/Types/types';
+
+// 提供调用匹配乡镇接口的函数
+export const townListService = (
+  townIDs: number[]
+) => {
+  return request.post('/promote/town', townIDs);
+}
