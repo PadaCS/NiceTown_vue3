@@ -69,7 +69,11 @@
     // 仅看我发布的:
     const viewMy = async()=>{
         console.log('viewMy被调用了')
-        isPromoter.value = true;
+        isPromoter.value = true;       
+         
+        //清空一下数据
+        clear()
+
         // 之后要写成带页码参数的形式
         let result = await viewMyService({pageNum:1, pageSize:10});
         // let result = await promoteListService({pageNum:1, pageSize:5, promoteType:'农家院'});
@@ -131,6 +135,7 @@
 
     const search = async()=>{
         console.log('search被调用了\n')
+
         // 判断是否为"我的"页面
         let result
         if(isPromoter.value == false){
@@ -153,6 +158,14 @@
             promote.townFullName = town ? `${town.province}${town.city}${town.name}` : '未知乡镇';
         });
         console.log('result:\n' + promotes.value)
+
+        //清空一下数据
+        clear()
+    }
+
+
+    const clear = () => {
+        categoryId.value = ''
     }
 
     // ———————————————————————————————————————————————————————————
