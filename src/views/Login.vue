@@ -95,13 +95,15 @@
     },
     ]
 
+
     //调用后台接口注册
     import {userRegisterService, userLoginService} from '@/api/user'
-
     const register = async()=>{
         let result = await userRegisterService(registerData.value);
+        isRegister.value = false
         ElMessage.success(result.msg?result.msg:'注册成功')
     }
+
 
     import { useRouter } from 'vue-router'
     const router = useRouter()

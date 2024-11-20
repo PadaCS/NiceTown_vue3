@@ -35,7 +35,8 @@ instance.interceptors.request.use(
   }
 )
 
-
+// import { useRouter } from 'vue-router'
+// const router = useRouter()
 import router from '@/router/index'
 
 // 添加响应拦截器
@@ -56,6 +57,8 @@ instance.interceptors.response.use(
     if(error.response.status === 401){
       ElMessage.error('请先登录');
       router.push('/login')
+    }else{
+      ElMessage.error('服务异常');
     }
     // 返回一个失败的 Promise
     return Promise.reject(error);
