@@ -103,13 +103,18 @@
         ElMessage.success(result.msg?result.msg:'注册成功')
     }
 
-    //路由用
     import { useRouter } from 'vue-router'
     const router = useRouter()
+    import { useTokenStore } from '@/stores/token';
+    const tokenStore = useTokenStore()
+
     //调用后台接口登录
     const login = async()=>{
         let result = await userLoginService(loginData.value);
         ElMessage.success(result.msg?result.msg:'登录成功');
+        //把得到的token存储到pinia中
+        tokenStore.setToken(result.data)
+        // console.log('Token:' + result.data)
         router.push('/')
     }
 
