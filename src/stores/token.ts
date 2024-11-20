@@ -18,9 +18,15 @@ export const useTokenStore = defineStore('token', () => {
 
   //3. 函数 用于移除token的值
 
-const removeToken = ()=>{
-    token.value = ''
-}
+  const removeToken = ()=>{
+      token.value = ''
+  }
 
   return { token, setToken, removeToken }
-})
+}
+// {
+//   // @ts-ignore 报错报错报你妈呢，语法检查给你关了
+//   persist: true
+// }
+
+)

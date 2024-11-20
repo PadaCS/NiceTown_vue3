@@ -13,6 +13,31 @@ const instance: AxiosInstance = axios.create({
   baseURL,
 });
 
+
+import { useTokenStore } from '@/stores/token';
+
+//添加请求拦截器
+instance.interceptors.request.use(
+  (config)=>{
+    //请求前的回调
+    //添加token
+    const tokenStore = useTokenStore();
+    //判断有没有tokne
+    if(tokenStore.token){
+      config.headers.Authorization = tokenStore.token
+    }
+    return config;
+
+  },
+  (err)=>{
+    //请求错误的回调
+    Promise.reject(err)
+  }
+)
+
+
+import router from '@/router/index'
+
 // 添加响应拦截器
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
@@ -27,8 +52,11 @@ instance.interceptors.response.use(
     return Promise.reject(response.data);
   },
   (error) => {
-    // 错误处理
-    ElMessage.error('服务异常');
+    //判断是不是未登录（401）
+    if(error.response.status === 401){
+      ElMessage.error('请先登录');
+      router.push('/login')
+    }
     // 返回一个失败的 Promise
     return Promise.reject(error);
   }

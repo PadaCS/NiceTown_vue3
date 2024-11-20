@@ -14,9 +14,11 @@
     const promotes = ref<Promote[]>([]);    const promoteList = async()=>{
         console.log('promoteList被调用了')
         // 之后要写成带页码参数的形式
-        let result = await promoteListService({pageNum:1, pageSize:5});
-        console.log('result:\n' + result)
+        let result = await promoteListService({pageNum:1, pageSize:10});
+        // let result = await promoteListService({pageNum:1, pageSize:5, promoteType:'农家院'});
         promotes.value = result.data.items || [];
+
+        console.log('result:\n' + promotes.value)
     }
     promoteList()
 
