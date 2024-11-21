@@ -3,6 +3,7 @@ import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
 
 import Promote from '../views/Promote/Promote.vue'
+import PromoteDetail from '../views/Promote/Detail.vue'
 import Support from '../views/Support/Support.vue'
 import UserBasis from '../views/User/Basis.vue'
 import ResetPsw from '../views/User/ResetPsw.vue'
@@ -20,11 +21,16 @@ const router = createRouter({
       name: 'home',
       component: Home,
       redirect: '/promote',
-      children:[
+      children: [
         {
           path: '/promote',
           name: 'promote',
           component: Promote,
+        },
+        {
+          path: '/promoteDetail',
+          name: 'detail',
+          component: PromoteDetail,
         },
         {
           path: '/support',

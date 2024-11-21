@@ -1,268 +1,282 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Edit, Delete } from '@element-plus/icons-vue'
+    import { ref } from 'vue'
+    import { Edit, Delete } from '@element-plus/icons-vue'
 
-// ———————————————————————————————————————————————————————————
-// ——————————————————————分页展示相关功能——————————————————————
-// ———————————————————————————————————————————————————————————
+    // ———————————————————————————————————————————————————————————
+    // ——————————————————————分页展示相关功能——————————————————————
+    // ———————————————————————————————————————————————————————————
 
-//分页条数据模型
-const pageNum = ref(1)//当前页
-const total = ref(20)//总条数
-const pageSize = ref(6)//每页条数
+    //分页条数据模型
+    const pageNum = ref(1)//当前页
+    const total = ref(20)//总条数
+    const pageSize = ref(6)//每页条数
 
-//当每页条数发生了变化，调用此函数
-const onSizeChange = async (size: number) => {
-    pageSize.value = size
-    search()
-}
-//当前页码发生变化，调用此函数
-const onCurrentChange = (num: number) => {
-    pageNum.value = num
-    search()
-}
-
-
-// ———————————————————————————————————————————————————————————
-// ——————————————————————数据回显相关功能——————————————————————
-// ———————————————————————————————————————————————————————————
-
-import { promoteListService, townListService, viewMyService, deleteService, createPromoteService } from '@/api/promote'
-import type { Promote, Towns } from '@/Types/types'; // 定义 Promote 类型
-
-// 定义 promotes, towns, categorys 类型
-const promotes = ref<Promote[]>([]);
-const towns = ref<Towns[]>([])
-const categorys = ref([
-    {
-        id: 1,
-        categoryName: "农家院"
-    },
-    {
-        id: 2,
-        categoryName: "自然风光秀丽"
-    },
-    {
-        id: 3,
-        categoryName: "古建筑"
-    },
-    {
-        id: 4,
-        categoryName: "土特产"
-    },
-    {
-        id: 5,
-        categoryName: "特色小吃"
-    },
-    {
-        id: 6,
-        categoryName: "民俗活动"
+    //当每页条数发生了变化，调用此函数
+    const onSizeChange = async (size: number) => {
+        pageSize.value = size
+        search()
     }
-]);
-
-//定义其它前置数据
-const isPromoter = ref(false)
-const categoryId = ref('')
-
-// 定义 getCategoryNameById 函数
-const getCategoryNameById = (id: any) => {
-    const category = categorys.value.find((item) => item.id === id);
-    return category?.categoryName;
-};
-
-// 定义 promoteList 函数
-const promoteList = async () => {
-    console.log('promoteList被调用了')
-    isPromoter.value = false;
-    // 之后要写成带页码参数的形式
-    let result = await promoteListService({ pageNum: pageNum.value, pageSize: pageSize.value, promoteType: getCategoryNameById(categoryId.value) });
-    promotes.value = result.data.items || [];
-    total.value = result.data.total || 0;
-
-    // 调用 townList 获取 towns 数据
-    if (promotes.value != null) {
-        await townList();
+    //当前页码发生变化，调用此函数
+    const onCurrentChange = (num: number) => {
+        pageNum.value = num
+        search()
     }
 
-    // 为 promotes 添加 townFullName
-    promotes.value.forEach((promote) => {
-        const town = towns.value.find((t) => t.townID === promote.townID);
-        promote.townFullName = town ? `${town.province}${town.city}${town.name}` : '未知乡镇';
-    });
 
-    clear()
-}
-promoteList()
+    // ———————————————————————————————————————————————————————————
+    // ——————————————————————数据回显相关功能——————————————————————
+    // ———————————————————————————————————————————————————————————
 
-// 定义 townList 函数
-const townList = async () => {
-    console.log('townList被调用了');
+    import { promoteListService, townListService, viewMyService, deleteService, createPromoteService } from '@/api/promote'
+    import type { Promote, Towns } from '@/Types/types'; // 定义 Promote 类型
 
-    // 提取 promotes.value 中的 townID 列表
-    const townIDs = promotes.value.map((promote) => promote.townID);
-    console.log('townIDs:', townIDs);
-
-    // 调用 townListService 获取 towns 数据
-    let result = await townListService(townIDs);
-    towns.value = result.data || [];
-    // let result
-    // if(townIDs != null){
-    //     result = await townListService(townIDs);
-    //     towns.value = result.data || [];
-    // }else{
-    //     result = null
-    // }
-    console.log('towns:', towns.value);
-
-};
-
-
-
-// 定义 viewMy 函数
-const viewMy = async () => {
-    console.log('viewMy被调用了')
-    isPromoter.value = true;
-
-    //清空一下数据
-    clear()
-
-    let result = await viewMyService({ pageNum: pageNum.value, pageSize: pageSize.value, promoteType: getCategoryNameById(categoryId.value) });
-
-    promotes.value = result.data.items || [];
-    total.value = result.data.total || 0;
-
-    // 调用 townList 获取 towns 数据
-    if (promotes.value != null) {
-        await townList();
-    }
-
-    // 为 promotes 添加 townFullName
-    promotes.value.forEach((promote) => {
-        const town = towns.value.find((t) => t.townID === promote.townID);
-        promote.townFullName = town ? `${town.province}${town.city}${town.name}` : '未知乡镇';
-    });
-
-    console.log('result:\n' + promotes.value)
-}
-
-
-// ———————————————————————————————————————————————————————————
-// ——————————————————————搜索栏相关功能——————————————————————
-// ———————————————————————————————————————————————————————————
-
-
-// 定义 search 函数
-const search = async () => {
-    console.log('search被调用了\n')
-
-    // 判断是否为"我的"页面
-    if (isPromoter.value == false) {
-        await promoteList()
-    } else {
-        await viewMy()
-    }
-}
-
-
-const clear = () => {
-    categoryId.value = ''
-}
-
-const reset = async () => {
-    clear()
-    // 判断是否为"我的"页面
-    if (isPromoter.value == false) {
-        await promoteList()
-    } else {
-        await viewMy()
-    }
-}
-
-// ———————————————————————————————————————————————————————————
-// ——————————————————删除,编辑,发布宣传相关功能—————————————————
-// ———————————————————————————————————————————————————————————
-import { ElMessageBox, ElMessage } from 'element-plus';
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
-
-//删除宣传功能
-const deletePromote = async (promoteID: number) => {
-
-    console.log("接收到的promoteID:" + promoteID)
-
-    // 弹出确认框
-    await ElMessageBox.confirm(
-        '确定要删除这条宣传吗？',
-        '删除确认',
+    // 定义 promotes, towns, categorys 类型
+    const promotes = ref<Promote[]>([]);
+    const towns = ref<Towns[]>([])
+    const categorys = ref([
         {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
+            id: 1,
+            categoryName: "农家院"
+        },
+        {
+            id: 2,
+            categoryName: "自然风光秀丽"
+        },
+        {
+            id: 3,
+            categoryName: "古建筑"
+        },
+        {
+            id: 4,
+            categoryName: "土特产"
+        },
+        {
+            id: 5,
+            categoryName: "特色小吃"
+        },
+        {
+            id: 6,
+            categoryName: "民俗活动"
         }
-    );
+    ]);
 
-    await deleteService(promoteID);
+    //定义其它前置数据
+    const isPromoter = ref(false)
+    const categoryId = ref('')
 
-    ElMessage.success('删除成功')
-    await viewMy()
-}
+    // 定义 getCategoryNameById 函数
+    const getCategoryNameById = (id: any) => {
+        const category = categorys.value.find((item) => item.id === id);
+        return category?.categoryName;
+    };
 
+    // 定义 promoteList 函数
+    const promoteList = async () => {
+        console.log('promoteList被调用了')
+        isPromoter.value = false;
+        // 之后要写成带页码参数的形式
+        let result = await promoteListService({ pageNum: pageNum.value, pageSize: pageSize.value, promoteType: getCategoryNameById(categoryId.value) });
+        promotes.value = result.data.items || [];
+        total.value = result.data.total || 0;
 
+        // 调用 townList 获取 towns 数据
+        if (promotes.value != null) {
+            await townList();
+        }
 
-import { Plus } from '@element-plus/icons-vue'
-//控制抽屉是否显示
-const visibleCreate = ref(false)
-const create = () => {
-    visibleCreate.value = true
-}
-//添加表单数据模型
-const PromoteModel = ref({
-    townID: '',//下拉选择框 "请选择您要宣传的城市"
-    townFullName: '',//用来存乡镇全名
-    promoteType: '',//下拉选择框 "请选择宣传类型"
-    theme: '',//文字输入框 "请输入主题"
-    description: '',//文字输入框 "请输入宣传内容"
-    images: '',//一个框上传图片或视频,最多五个
-    videos: ''
-})
+        // 为 promotes 添加 townFullName
+        promotes.value.forEach((promote) => {
+            const town = towns.value.find((t) => t.townID === promote.townID);
+            promote.townFullName = town ? `${town.province}${town.city}${town.name}` : '未知乡镇';
+        });
 
-const allTowns = ref([
-    {
-        townID: 1,
-        categoryName: "北京北京市海淀区"
-    },
-    {
-        townID: 2,
-        categoryName: "新疆乌鲁木齐米东区"
-    },
-    {
-        townID: 3,
-        categoryName: "贵州省贵阳市南明区"
-    },
-    {
-        townID: 4,
-        categoryName: "河北省秦皇岛市海港区"
+        clear()
     }
-]);
+    promoteList()
 
-const createPromote = async() => {
-    console.log("发送PUT请求的Promote参数：" + PromoteModel.value)
-    await createPromoteService(PromoteModel.value)
-    ElMessage.success('发布成功')
-    visibleCreate.value = false
-}
+    // 定义 townList 函数
+    const townList = async () => {
+        console.log('townList被调用了');
 
-// ———————————————————————————————————————————————————————————
-// —————————————————————————文件上传功能———————————————————————
-// ———————————————————————————————————————————————————————————
-import { useTokenStore } from '@/stores/token';
-const tokenStore = useTokenStore()
-const uploadSuccess = (result:any)=>{
-    PromoteModel.value.images += `, ${result.data}`
-    ElMessage.success('上传成功')
-    console.log("result:" + result.data + "\nPromoteModel.value.images:" + PromoteModel.value.images);
-}
+        // 提取 promotes.value 中的 townID 列表
+        const townIDs = promotes.value.map((promote) => promote.townID);
+        console.log('townIDs:', townIDs);
+
+        // 调用 townListService 获取 towns 数据
+        let result = await townListService(townIDs);
+        towns.value = result.data || [];
+        // let result
+        // if(townIDs != null){
+        //     result = await townListService(townIDs);
+        //     towns.value = result.data || [];
+        // }else{
+        //     result = null
+        // }
+        console.log('towns:', towns.value);
+
+    };
+
+
+
+    // 定义 viewMy 函数
+    const viewMy = async () => {
+        console.log('viewMy被调用了')
+        isPromoter.value = true;
+
+        //清空一下数据
+        clear()
+
+        let result = await viewMyService({ pageNum: pageNum.value, pageSize: pageSize.value, promoteType: getCategoryNameById(categoryId.value) });
+
+        promotes.value = result.data.items || [];
+        total.value = result.data.total || 0;
+
+        // 调用 townList 获取 towns 数据
+        if (promotes.value != null) {
+            await townList();
+        }
+
+        // 为 promotes 添加 townFullName
+        promotes.value.forEach((promote) => {
+            const town = towns.value.find((t) => t.townID === promote.townID);
+            promote.townFullName = town ? `${town.province}${town.city}${town.name}` : '未知乡镇';
+        });
+
+        console.log('result:\n' + promotes.value)
+    }
+
+
+    // ———————————————————————————————————————————————————————————
+    // ——————————————————————搜索栏相关功能——————————————————————
+    // ———————————————————————————————————————————————————————————
+
+
+    // 定义 search 函数
+    const search = async () => {
+        console.log('search被调用了\n')
+
+        // 判断是否为"我的"页面
+        if (isPromoter.value == false) {
+            await promoteList()
+        } else {
+            await viewMy()
+        }
+    }
+
+
+    const clear = () => {
+        categoryId.value = ''
+    }
+
+    const reset = async () => {
+        clear()
+        // 判断是否为"我的"页面
+        if (isPromoter.value == false) {
+            await promoteList()
+        } else {
+            await viewMy()
+        }
+    }
+
+    // ———————————————————————————————————————————————————————————
+    // ——————————————————删除,编辑,发布宣传相关功能—————————————————
+    // ———————————————————————————————————————————————————————————
+    import { ElMessageBox, ElMessage } from 'element-plus';
+    import { QuillEditor } from '@vueup/vue-quill'
+    import '@vueup/vue-quill/dist/vue-quill.snow.css'
+
+    //删除宣传功能
+    const deletePromote = async (promoteID: number) => {
+
+        console.log("接收到的promoteID:" + promoteID)
+
+        // 弹出确认框
+        await ElMessageBox.confirm(
+            '确定要删除这条宣传吗？',
+            '删除确认',
+            {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
+        );
+
+        await deleteService(promoteID);
+
+        ElMessage.success('删除成功')
+        await viewMy()
+    }
+
+
+
+    import { Plus } from '@element-plus/icons-vue'
+    //控制抽屉是否显示
+    const visibleCreate = ref(false)
+    const create = () => {
+        visibleCreate.value = true
+    }
+    //添加表单数据模型
+    const PromoteModel = ref({
+        townID: '',//下拉选择框 "请选择您要宣传的城市"
+        townFullName: '',//用来存乡镇全名
+        promoteType: '',//下拉选择框 "请选择宣传类型"
+        theme: '',//文字输入框 "请输入主题"
+        description: '',//文字输入框 "请输入宣传内容"
+        images: '',//一个框上传图片或视频,最多五个
+        videos: ''
+    })
+
+    const allTowns = ref([
+        {
+            townID: 1,
+            categoryName: "北京北京市海淀区"
+        },
+        {
+            townID: 2,
+            categoryName: "新疆乌鲁木齐米东区"
+        },
+        {
+            townID: 3,
+            categoryName: "贵州省贵阳市南明区"
+        },
+        {
+            townID: 4,
+            categoryName: "河北省秦皇岛市海港区"
+        }
+    ]);
+
+    // 定义 createPromote 函数
+    const createPromote = async() => {
+        console.log("发送PUT请求的Promote参数：" + PromoteModel.value)
+        await createPromoteService(PromoteModel.value)
+        ElMessage.success('发布成功')
+        visibleCreate.value = false
+    }
+
+    // ———————————————————————————————————————————————————————————
+    // —————————————————————————文件上传功能———————————————————————
+    // ———————————————————————————————————————————————————————————
+    import { useTokenStore } from '@/stores/token';
+    const tokenStore = useTokenStore()
+    const uploadSuccess = (result:any)=>{
+        PromoteModel.value.images += `, ${result.data}`
+        ElMessage.success('上传成功')
+        console.log("result:" + result.data + "\nPromoteModel.value.images:" + PromoteModel.value.images);
+    }
+
+    import { useRouter } from 'vue-router'
+    const router = useRouter()
+    import { usePromoteStore } from '@/stores/Promote';
+    const promoteStore = usePromoteStore()
+    const showDetails = (row: any)=>{
+        promoteStore.setPromote(row)
+        console.log('点击的行数据:', row);
+        // 页面跳转
+        router.push('/promoteDetail')
+    }
+
 </script>
+
 <template>
     <el-card class="page-container">
         <!-- ——————————————————————顶部—————————————————————— -->
@@ -292,7 +306,7 @@ const uploadSuccess = (result:any)=>{
         </el-form>
 
         <!-- ——————————————————————文章列表—————————————————————— -->
-        <el-table :data="promotes" style="width: 100%">
+        <el-table :data="promotes" style="width: 100%" @row-click="showDetails">
             <el-table-column label="序号" width="100" type="index" theme> </el-table-column>
             <el-table-column label="主题" prop="theme"></el-table-column>
             <el-table-column label="乡镇" prop="townFullName"></el-table-column>
