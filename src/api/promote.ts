@@ -28,3 +28,11 @@ export const deleteService = (
 ) => {
   return request.put('/promote/delete', {promoteID});
 }
+
+// 发布宣传
+export const createPromoteService = (
+  promote: Record<string, any>
+): Promise<any> => {
+  // console.log("发送PUT请求的Promote参数：" + promote)
+  return request.put('/promote/create', promote)
+}

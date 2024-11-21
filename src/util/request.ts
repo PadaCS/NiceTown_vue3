@@ -53,6 +53,7 @@ instance.interceptors.response.use(
     return Promise.reject(response.data);
   },
   (error) => {
+    console.log("error:" + error)
     //判断是不是未登录（401）
     if(error.response.status === 401){
       ElMessage.error('请先登录');
