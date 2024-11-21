@@ -57,10 +57,6 @@ import {
 
         <!-- 右侧主区域 -->
         <el-container>
-            <!-- 头部区域 -->
-            <el-header>
-            </el-header>
-
             <!-- 中间区域 -->
             <el-main>
                 <RouterView ></RouterView>

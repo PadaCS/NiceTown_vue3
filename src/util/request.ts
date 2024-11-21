@@ -58,7 +58,7 @@ instance.interceptors.response.use(
       ElMessage.error('请先登录');
       router.push('/login')
     }else{
-      ElMessage.error('服务异常');
+      ElMessage.error(error.msg?error.msg:'服务异常');
     }
     // 返回一个失败的 Promise
     return Promise.reject(error);

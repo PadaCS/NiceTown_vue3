@@ -21,3 +21,10 @@ export const townListService = (
 ) => {
   return request.post('/promote/town', townIDs);
 }
+
+// 删除宣传
+export const deleteService = (
+  promoteID: number
+) => {
+  return request.put('/promote/delete', {promoteID});
+}
