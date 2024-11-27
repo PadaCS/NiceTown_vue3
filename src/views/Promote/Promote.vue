@@ -22,7 +22,6 @@
         search()
     }
 
-
     // ———————————————————————————————————————————————————————————
     // ——————————————————————数据回显相关功能——————————————————————
     // ———————————————————————————————————————————————————————————
@@ -116,8 +115,6 @@
 
     };
 
-
-
     // 定义 viewMy 函数
     const viewMy = async () => {
         console.log('viewMy被调用了')
@@ -145,11 +142,9 @@
         console.log('result:\n' + promotes.value)
     }
 
-
     // ———————————————————————————————————————————————————————————
     // ——————————————————————搜索栏相关功能——————————————————————
     // ———————————————————————————————————————————————————————————
-
 
     // 定义 search 函数
     const search = async () => {
@@ -162,7 +157,6 @@
             await viewMy()
         }
     }
-
 
     const clear = () => {
         categoryId.value = ''
@@ -206,8 +200,6 @@
         ElMessage.success('删除成功')
         await viewMy()
     }
-
-
 
     import { Plus } from '@element-plus/icons-vue'
     //控制抽屉是否显示
@@ -259,7 +251,13 @@
     import { useTokenStore } from '@/stores/token';
     const tokenStore = useTokenStore()
     const uploadSuccess = (result:any)=>{
-        PromoteModel.value.images += `, ${result.data}`
+        if (PromoteModel.value.images) {
+            // 如果已有图片，则在前面加逗号
+            PromoteModel.value.images += `, ${result.data}`;
+        } else {
+            // 如果是第一个上传的图片，直接赋值
+            PromoteModel.value.images = result.data;
+        }
         ElMessage.success('上传成功')
         console.log("result:" + result.data + "\nPromoteModel.value.images:" + PromoteModel.value.images);
     }
@@ -270,6 +268,7 @@
     const promoteStore = usePromoteStore()
     const showDetails = (row: any)=>{
         promoteStore.setPromote(row)
+        promoteStore.setStatus(isPromoter.value)
         console.log('点击的行数据:', row);
         // 页面跳转
         router.push('/promoteDetail')
@@ -313,15 +312,11 @@
             <el-table-column label="类型" prop="promoteType"></el-table-column>
             <!-- 这一行只在查看我自己的宣传的时候显示 -->
             <el-table-column label="操作" width="100" v-if="isPromoter">
-                <!-- <template #default="{ row }" v-if="isPromoter"> -->
                 <template #default="{ row }">
                     <el-button :icon="Edit" circle plain type="primary"></el-button>
                     <el-button :icon="Delete" circle plain type="danger"
                         @click="deletePromote(row.promoteID)"></el-button>
                 </template>
-                <!-- <template #default="{ row }" v-else>
-                    <el-button :icon="HelpFilled" circle plain type="primary"></el-button>
-                </template> -->
             </el-table-column>
             <template #empty>
                 <el-empty description="没有数据" />

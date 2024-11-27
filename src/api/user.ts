@@ -1,7 +1,8 @@
-// 导入请求工具
 import request from '@/util/request'
 
-// 提供调用注册接口的函数
+// ———————————————————————————————————————————————————
+// ——————————————————————注册接口——————————————————————
+// ———————————————————————————————————————————————————
 export const userRegisterService = (registerData: Record<string, any>): Promise<any> => {
   // 借助于 URLSearchParams 完成传递
   const params = new URLSearchParams();
@@ -15,6 +16,10 @@ export const userRegisterService = (registerData: Record<string, any>): Promise<
   return request.post('/user/register', params);
 };
 
+
+// ———————————————————————————————————————————————————
+// ——————————————————————登录接口——————————————————————
+// ———————————————————————————————————————————————————
 export const userLoginService = (loginData: Record<string, any>): Promise<any> => {
   // 借助于 URLSearchParams 完成传递
   console.log("我点击了登录按钮")
@@ -28,3 +33,11 @@ export const userLoginService = (loginData: Record<string, any>): Promise<any> =
   // 返回 POST 请求
   return request.post('/user/login', params);
 };
+
+// ———————————————————————————————————————————————————
+// —————————————————————获取用户名—————————————————————
+// ———————————————————————————————————————————————————
+export const findUserByIDService = (ID:number) => {
+  console.log("我找我找我找，你是谁！！！")
+  return request.get('/user/get', {params:{userID: ID}} )
+}
