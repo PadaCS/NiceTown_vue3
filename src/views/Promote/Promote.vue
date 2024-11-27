@@ -304,7 +304,7 @@
             </el-form-item>
         </el-form>
 
-        <!-- ——————————————————————文章列表—————————————————————— -->
+        <!-- ——————————————————————宣传列表—————————————————————— -->
         <el-table :data="promotes" style="width: 100%" @row-click="showDetails">
             <el-table-column label="序号" width="100" type="index" theme> </el-table-column>
             <el-table-column label="主题" prop="theme"></el-table-column>

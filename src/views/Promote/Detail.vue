@@ -1,17 +1,30 @@
 <script setup lang="ts">
     import { ref, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
+    const router = useRouter(); // 获取router实例
+    import { Close, Check } from '@element-plus/icons-vue';
+    import { supportListService } from '@/api/support'
+    import { findPromoteByIDService } from '@/api/promote'
 
-
+    // ————————————————————————————————————————————————————
+    // —————————————————————数据初始化——————————————————————
+    // ————————————————————————————————————————————————————
+    import { usePromoteStore } from '@/stores/Promote'
+    const promoteStore = usePromoteStore()
+    const isPromoter = ref(promoteStore.isPromoter)
+    console.log("isPromoter:" + isPromoter.value)
+    
     // ———————————————————————————————————————————————————————————
     // ——————————————————————数据回显相关功能——————————————————————
     // ———————————————————————————————————————————————————————————
+    
+    // ——————————————————————宣传内容回显——————————————————————
     // 这个页面永远显示的是pinia里存储的promote信息
 
-    import { usePromoteStore } from '@/stores/Promote'
-    const promoteStore = usePromoteStore()
     const data = promoteStore.promote;
     const promoteDetails = ref({
+        // @ts-ignore
+        promoteID: data.promoteID,
         // @ts-ignore
         theme: data.theme,
         // @ts-ignore
@@ -34,35 +47,94 @@
         // supportInfo: [] // 可根据实际情况填充
     });
 
+    // ——————————————————————用户名回显——————————————————————
     //把用户id改成用户名再回显
     import { findUserByIDService } from '@/api/user'
     const getUser = async(id:number) => {
-        const data = await findUserByIDService(id)
-        const userName = data.data
+        const userList:number[] = [id]
+        const data = await findUserByIDService(userList)
+        const userName = data.data[0]
         console.log("我查询了用户名，用户名是：", userName)
         promoteDetails.value.promoter = userName
         return userName
     }
     // @ts-ignore
-    getUser(data.promotterID)
+    // getUser(data.promotterID)
 
 
-    const isPromoter = ref(promoteStore.isPromoter)
-    console.log("isPromoter:" + isPromoter.value)
 
-    const supportInfo = ref([
-            { user: '李四', time: '2024-11-22', amount: 100 },
-            { user: '王五', time: '2024-11-23', amount: 50 }
-        ]) 
+    // ——————————————————————助力情况回显——————————————————————
+    import type { Support } from '@/Types/types';
+    const supportInfo = ref<Support[]>([])
+    // 从后端获取support
+    const getSupport = async() => {
+        // @ts-ignore
+        let result = await supportListService({promoteID: data.promoteID});
+        console.log("查询全部助力：", result.data )
+        supportInfo.value = result.data
+    }
+    
+    // 将supports处理成我们要看到的显示形式
+    const handleSupportData = async () => {
+        const promoteIDs = supportInfo.value.map(support => support.promoteID);
+        const userIDs = supportInfo.value.map(support => support.userID);
 
-    const router = useRouter(); // 获取router实例
-    const handleSupport = () => {
+        // 并行处理两个异步请求
+        const [promoteResult, userResult] = await Promise.all([
+            findPromoteByIDService(promoteIDs),
+            findUserByIDService(userIDs)
+        ]);
+
+        const promoteData = promoteResult.data;
+        const userData = userResult.data;
+
+        // 更新 supportInfo 的 promoteTheme 和 user
+        supportInfo.value.forEach((support, index) => {
+            const matchedPromote = promoteData.find((promote: any) => promote.promoteID === support.promoteID);
+            if (matchedPromote) {
+                support.promoteTheme = matchedPromote.theme;
+            }
+            support.user = userData[index];
+        });
+    };
+
+    const statusMap = {
+        0: "待接受",
+        1: "同意",
+        2: "拒绝",
+        3: "取消"
+    };
+
+    import { computed } from 'vue';
+    // 过滤掉已取消的助力并显示为中文。回显时调用这个filteredSupportInfo变量
+    const filteredSupportInfo = computed(() => {
+        return supportInfo.value
+            .filter(support => support.status !== 3) // 过滤掉状态为 3 的记录
+            .map(support => ({
+                ...support,
+                statusString: statusMap[support.status as keyof typeof statusMap]  // 添加 statusString 字段
+            }));
+    });
+
+    onMounted(async () => {
+        // @ts-ignore
+        await getUser(data.promotterID);
+        await getSupport();
+        if(supportInfo.value.length > 0){
+            await handleSupportData(); 
+        }
+    });
+    // ———————————————————————————————————————————————————————————
+    // ——————————————————————助力操作相关功能——————————————————————
+    // ———————————————————————————————————————————————————————————
+    const createSupport = () => {
         // 这里可以触发一个请求到后端，进行助力操作
         console.log('用户进行助力');
     };
 
     const goBack = () => {
         // 跳转到/promote页面
+        promoteStore.removePromote();
         router.push('/promote');
     };
 
@@ -115,14 +187,34 @@
         <!-- 助力情况区域 -->
         <div class="support-container">
             <h2 class="support-title">助力情况</h2>
-            <div class="support-info">
-                <div class="support-item" v-for="(support, index) in supportInfo" :key="index">
-                    <p>用户：{{ support.user }} | 时间：{{ support.time }} | 助力金额：{{ support.amount }} 元</p>
-                </div>
-            </div>
+            <!-- ——————————————————————助力列表—————————————————————— -->
+            <el-table :data="filteredSupportInfo" style="width: 100%" @row-click="showDetails"class="supportList">
+                <el-table-column label="序号" width="100" type="index" theme> </el-table-column>
+                <el-table-column label="发布者" prop="user"></el-table-column>
+                <el-table-column label="被助力宣传" prop="promoteTheme"></el-table-column>
+                <el-table-column label="状态" prop="statusString"></el-table-column>
+                <!-- 这一行只在查看我自己的宣传的时候显示 -->
+                <el-table-column label="操作" width="100" v-if="isPromoter">
+                    <template #default="{ row }">
+                        <div v-if="row.status == 0">
+                            <el-button :icon="Check" circle plain type="primary"
+                                @click="acceptSupport(row.SupportID)"></el-button>
+                            <el-button :icon="Close" circle plain type="danger"
+                                @click="denySupport(row.SupportID)"></el-button>
+                        </div>
+                        <div v-else>
+                            助力成功
+                        </div>
+                    </template>
+                </el-table-column>
+                <template #empty>
+                    <el-empty description="没有数据" />
+                </template>
+            </el-table>
             <!-- 我要助力按钮 -->
-            <button class="support-btn" @click="handleSupport">我要助力</button>
+            <button class="support-btn" @click="createSupport" v-if="!isPromoter">我要助力</button>
         </div>
+
     </div>
 </template>
 
@@ -231,37 +323,34 @@
 
     /* 助力情况样式 */
     .support-container {
+        display: flex;
+        flex-direction: column; 
+        align-items: center; 
         margin-top: 40px;
         padding: 20px;
         background-color: #f4f4f4;
         border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-
+    .supportList {
+        border-radius: 20px;
+        background-color: #fcfcff;
+    }
     .support-title {
         font-size: 20px;
         text-align: center;
         margin-bottom: 20px;
     }
 
-    .support-info {
-        margin-bottom: 20px;
-    }
-
-    .support-item {
-        font-size: 14px;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
     .support-btn {
         display: block;
-        width: 100%;
+        width: 60%;
         padding: 10px;
+        margin: 10px;
         background-color: #4CAF50;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 8px;
         font-size: 16px;
         cursor: pointer;
     }

@@ -36,3 +36,14 @@ export const createPromoteService = (
   // console.log("发送PUT请求的Promote参数：" + promote)
   return request.put('/promote/create', promote)
 }
+
+// 根据宣传id匹配宣传数据
+export const findPromoteByIDService = (
+  promoteID: number[]
+) => {
+  // 手动格式化查询参数
+  const params = new URLSearchParams();
+  promoteID.forEach(id => params.append('promoteID', id.toString()));
+  // console.log("请求参数:", params.toString());  // 确保参数格式正确
+  return request.get('/promote/find', {params});
+}

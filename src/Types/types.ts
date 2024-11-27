@@ -22,15 +22,17 @@ export interface Promote {
     province: string,
   }
 
-  export interface support {
+  export interface Support {
     supportID: number,
-    promoteID: number,//用于检索promote
-    userID: number,//用于检索user
-    user: string,//显示+预览
-    supDescrip: string,//显示+预览
-    images: string,//显示
-    videos: string,//显示
-    createTime: string;//显示
-    lastModified: string;//显示
-    status: number,////显示 （0：待接受；1：同意；2：拒绝；3：取消）
+    promoteID: number, //用于检索promoteTheme
+    promoteTheme: string, //显示+预览
+    userID: number, //用于检索user
+    user: string, //显示+预览
+    supDescrip: string, //显示
+    images: string, //显示
+    videos: string, //显示
+    createTime: string; //显示
+    lastModified: string; //显示
+    status: number, //显示+预览（0：待接受；1：同意；2：拒绝；3：取消）
+    statusString: String,
   }

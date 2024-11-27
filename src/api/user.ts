@@ -37,7 +37,10 @@ export const userLoginService = (loginData: Record<string, any>): Promise<any> =
 // ———————————————————————————————————————————————————
 // —————————————————————获取用户名—————————————————————
 // ———————————————————————————————————————————————————
-export const findUserByIDService = (ID:number) => {
-  console.log("我找我找我找，你是谁！！！")
-  return request.get('/user/get', {params:{userID: ID}} )
+export const findUserByIDService = (ID:number[]) => {
+  // 手动格式化查询参数
+  const params = new URLSearchParams();
+  ID.forEach(id => params.append('userID', id.toString()));
+  return request.get('/user/get', {params});
+  // return request.get('/user/get', {params:{userID: ID}} )
 }

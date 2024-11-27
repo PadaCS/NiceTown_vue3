@@ -18,6 +18,7 @@ export const usePromoteStore = defineStore('promote', () => {
 
   //3. 函数 用于移除promote的值
   const removePromote = ()=>{
+    console.log('pinia中的Promote已被移除');
     promote.value = ''
   }
 
