@@ -214,7 +214,7 @@
         promoteType: '',//下拉选择框 "请选择宣传类型"
         theme: '',//文字输入框 "请输入主题"
         description: '',//文字输入框 "请输入宣传内容"
-        images: '',//一个框上传图片或视频,最多五个
+        images: '',
         videos: ''
     })
 
@@ -250,7 +250,22 @@
     // ———————————————————————————————————————————————————————————
     import { useTokenStore } from '@/stores/token';
     const tokenStore = useTokenStore()
-    const uploadSuccess = (result:any)=>{
+
+    // —————————————————————————图片上传—————————————————————————
+    const beforeImageUpload = (file:any) => {
+        const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif';
+        const isLt50MB = file.size / 1024 / 1024 < 50;
+
+        if (!isType) {
+          ElMessage.error('上传图片只能是 JPG/PNG/GIF 格式!');
+        }
+        if (!isLt50MB) {
+            ElMessage.error('上传图片大小不能超过 50MB!');
+        }
+        return isType && isLt50MB;
+      }
+
+    const uploadImageSuccess = (result:any)=>{
         if (PromoteModel.value.images) {
             // 如果已有图片，则在前面加逗号
             PromoteModel.value.images += `, ${result.data}`;
@@ -259,7 +274,33 @@
             PromoteModel.value.images = result.data;
         }
         ElMessage.success('上传成功')
-        console.log("result:" + result.data + "\nPromoteModel.value.images:" + PromoteModel.value.images);
+        console.log("上传图片：" + result.data + "\nPromoteModel.value.images:" + PromoteModel.value.images);
+    }
+
+    // —————————————————————————视频上传—————————————————————————
+    const beforeVideoUpload = (file:any) => {
+        const isType = file.type === 'video/mp4';
+        const isLt50MB = file.size / 1024 / 1024 < 50;
+
+        if (!isType) {
+          ElMessage.error('上传视频只能是 MP4 格式!');
+        }
+        if (!isLt50MB) {
+            ElMessage.error('上传视频大小不能超过 50MB!');
+        }
+        return isType && isLt50MB;
+      }
+
+    const uploadVideoSuccess = (result:any)=>{
+        if (PromoteModel.value.videos) {
+            // 如果已有视频，则在前面加逗号
+            PromoteModel.value.videos += `, ${result.data}`;
+        } else {
+            // 如果是第一个上传的视频，直接赋值
+            PromoteModel.value.videos = result.data;
+        }
+        ElMessage.success('上传成功')
+        console.log("上传视频：" + result.data + "\nPromoteModel.value.videos:" + PromoteModel.value.videos);
     }
 
     import { useRouter } from 'vue-router'
@@ -273,6 +314,7 @@
         // 页面跳转
         router.push('/promoteDetail')
     }
+
 
 </script>
 
@@ -354,28 +396,61 @@
                         </quill-editor>
                     </div>
                 </el-form-item>
-                <!-- 上传图片/视频功能 -->
-                <el-form-item label="图片或视频">
+                <!-- 上传图片功能 -->
+                <el-form-item label="请上传图片">
                     <!-- 
                         action: 服务器接口路径
                         name: 上传文件的字段名
                         on-success: 上传成功的回调函数
+                        list-type：设置文件列表的样式
                     -->
                     <el-upload 
                         class="avatar-uploader" 
                         :multiple="true"
                         :auto-upload="true" 
+                        :before-upload="beforeImageUpload"
                         action="/api/upload"
+                        list-type="picture-card"
                         name="file"
                         :headers="{'Authorization':tokenStore.token}"
-                        :on-success="uploadSuccess"
+                        :on-success="uploadImageSuccess"
                     >
-                        <!-- <img v-if="PromoteModel.images" :src="PromoteModel.images" class="avatar" /> -->
                         <el-icon class="avatar-uploader-icon">
                             <Plus />
                         </el-icon>
+                        <template #tip>
+                            <div class="el-upload__tip">仅支持 jpg/png/gif 文件，且不超过 50MB</div>
+                        </template>
                     </el-upload>
                 </el-form-item>
+                
+                <!-- 上传/视频功能 -->
+                <el-form-item label="请上传视频">
+                    <!-- 
+                        action: 服务器接口路径
+                        name: 上传文件的字段名
+                        on-success: 上传成功的回调函数
+                        list-type：设置文件列表的样式
+                    -->
+                    <el-upload 
+                        class="avatar-uploader" 
+                        :multiple="true"
+                        :auto-upload="true" 
+                        :before-upload="beforeVideoUpload"
+                        action="/api/upload"
+                        name="file"
+                        :headers="{'Authorization':tokenStore.token}"
+                        :on-success="uploadVideoSuccess"
+                    >
+                        <el-icon class="avatar-uploader-icon">
+                            <Plus />
+                        </el-icon>
+                        <template #tip>
+                            <div class="el-upload__tip">仅支持 mp4 文件，且不超过 50MB</div>
+                        </template>
+                    </el-upload>
+                </el-form-item>
+
                 <el-form-item>
                     <el-button type="primary" @click="createPromote">发布</el-button>
                 </el-form-item>
@@ -386,60 +461,63 @@
 </template>
 
 <style lang="scss" scoped>
-.page-container {
-    min-height: 100%;
-    box-sizing: border-box;
+    .page-container {
+        min-height: 100%;
+        box-sizing: border-box;
 
-    .type {
-        min-width: 30dvh;
+        .type {
+            min-width: 30dvh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
     }
 
-    .header {
+
+
+    /* 抽屉样式 */
+    .avatar-uploader {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-}
+        flex-direction: column;
+        align-items: center; 
+        :deep() {
+            .avatar {
+                width: 178px;
+                height: 178px;
+                display: block;
+            }
 
+            .el-upload {
+                border: 1px dashed var(--el-border-color);
+                border-radius: 6px;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: var(--el-transition-duration-fast);
+            }
 
+            .el-upload:hover {
+                border-color: var(--el-color-primary);
+            }
 
-/* 抽屉样式 */
-.avatar-uploader {
-    :deep() {
-        .avatar {
-            width: 178px;
-            height: 178px;
-            display: block;
-        }
-
-        .el-upload {
-            border: 1px dashed var(--el-border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: var(--el-transition-duration-fast);
-        }
-
-        .el-upload:hover {
-            border-color: var(--el-color-primary);
-        }
-
-        .el-icon.avatar-uploader-icon {
-            font-size: 28px;
-            color: #8c939d;
-            width: 178px;
-            height: 178px;
-            text-align: center;
+            .el-icon.avatar-uploader-icon {
+                font-size: 28px;
+                color: #8c939d;
+                width: 178px;
+                height: 178px;
+                text-align: center;
+            }
         }
     }
-}
 
-.editor {
-    width: 100%;
+    .editor {
+        width: 100%;
 
-    :deep(.ql-editor) {
-        min-height: 200px;
+        :deep(.ql-editor) {
+            min-height: 200px;
+        }
     }
-}
 </style>

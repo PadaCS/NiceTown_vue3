@@ -14,3 +14,26 @@ export const supportListService = (
 export const viewMyService = () => {
     return request.get('/support/listmy');
 };
+
+// 发布助力申请
+export const createSupportService = (
+    support: Record<string, any>
+): Promise<any> => {
+    console.log("发送PUT请求的support参数2：" + support)
+    const result = request.put('/support/create', support)
+    console.log("发布助力申请：", result )
+    return result;
+}
+
+// 接受/拒绝助力申请
+export const operateService = ( Data: Record<string, any> ) => {
+    const params = new URLSearchParams();
+    for (const key in Data) {
+      if (Object.prototype.hasOwnProperty.call(Data, key)) {
+        params.append(key, Data[key]);
+      }
+    }
+    console.log("params:", params)
+        
+    return request.put('/support/operate', params);
+}
