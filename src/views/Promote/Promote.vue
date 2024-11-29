@@ -316,10 +316,9 @@
     const userStore = useUserStore()
 
     const showDetails = (row: any)=>{
-        console.log("\nuserStore.userName：", userStore.user?.userID)
-        console.log("\nrow.promotterID：", row.promotterID)
+        // console.log("\nuserStore.userName：", userStore.user?.userID)
+        // console.log("\nrow.promotterID：", row.promotterID)
         if(row.promotterID == userStore.user?.userID){
-            console.log("row.promotterID == userStore.userName")
             isPromoter.value = true
         }
         promoteStore.setPromote(row)
