@@ -303,11 +303,25 @@
         console.log("上传视频：" + result.data + "\nPromoteModel.value.videos:" + PromoteModel.value.videos);
     }
 
+
+
+    // ———————————————————————————————————————————————————————————
+    // —————————————————————————详情页跳转———————————————————————
+    // ———————————————————————————————————————————————————————————
     import { useRouter } from 'vue-router'
     const router = useRouter()
     import { usePromoteStore } from '@/stores/Promote';
     const promoteStore = usePromoteStore()
+    import { useUserStore } from '@/stores/UserStore';
+    const userStore = useUserStore()
+
     const showDetails = (row: any)=>{
+        console.log("\nuserStore.userName：", userStore.user?.userID)
+        console.log("\nrow.promotterID：", row.promotterID)
+        if(row.promotterID == userStore.user?.userID){
+            console.log("row.promotterID == userStore.userName")
+            isPromoter.value = true
+        }
         promoteStore.setPromote(row)
         promoteStore.setStatus(isPromoter.value)
         console.log('点击的行数据:', row);

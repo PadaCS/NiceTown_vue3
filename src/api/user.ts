@@ -44,3 +44,11 @@ export const findUserByIDService = (ID:number[]) => {
   return request.get('/user/get', {params});
   // return request.get('/user/get', {params:{userID: ID}} )
 }
+
+
+// ———————————————————————————————————————————————————
+// ——————————————————获取用户详细信息——————————————————
+// ———————————————————————————————————————————————————
+export const userInfoService = () => {
+  return request.get('/user/userinfo');
+}

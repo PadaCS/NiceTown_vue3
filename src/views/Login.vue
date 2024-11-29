@@ -97,7 +97,7 @@
 
 
     //调用后台接口注册
-    import {userRegisterService, userLoginService} from '@/api/user'
+    import {userRegisterService, userLoginService, userInfoService} from '@/api/user'
     const register = async()=>{
         let result = await userRegisterService(registerData.value);
         isRegister.value = false
@@ -109,6 +109,8 @@
     const router = useRouter()
     import { useTokenStore } from '@/stores/token';
     const tokenStore = useTokenStore()
+    import { useUserStore } from '@/stores/UserStore';
+    const userStore = useUserStore()
 
     //调用后台接口登录
     const login = async()=>{
@@ -116,8 +118,16 @@
         ElMessage.success(result.msg?result.msg:'登录成功');
         //把得到的token存储到pinia中
         tokenStore.setToken(result.data)
-        // console.log('Token:' + result.data)
+        await storeUser()
         router.push('/')
+    }
+
+    const storeUser = async()=>{
+        console.log("storeUser被调用\n")
+        let user = await userInfoService()
+        userStore.setUser(user.data)
+        console.log("我的user.data = ", user.data)
+        
     }
 
 </script>

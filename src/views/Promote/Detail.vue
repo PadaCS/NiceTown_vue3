@@ -71,8 +71,6 @@
         return userName
     }
 
-
-
     // ——————————————————————助力情况回显——————————————————————
     import type { Support } from '@/Types/types';
     const supportInfo = ref<Support[]>([])

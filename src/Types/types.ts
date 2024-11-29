@@ -36,3 +36,17 @@ export interface Promote {
     status: number, //显示+预览（0：待接受；1：同意；2：拒绝；3：取消）
     statusString: String,
   }
+
+  
+  export interface User {
+    userID: number
+    username: string
+    userType: string
+    fullName: string
+    documentType: string
+    documentID: string
+    phonenumber: string
+    introduction: string
+    registTime: string
+    lastModified: string
+  }
