@@ -54,9 +54,11 @@
     import { operateService, deleteService } from '@/api/support'
     const acceptSupport = async () => {
         operateSupport(1)
+        supportDetails.value.statusString = '同意'
     }
     const denySupport = async () => {
         operateSupport(2)
+        supportDetails.value.statusString = '拒绝'
     }
 
     const deleteSupport = async () => {
@@ -82,10 +84,10 @@
         }
         else{
             await operateService({promoteID: supportDetails.value.promoteID, supportID: supportDetails.value.supportID, operation: ope})
+            supportDetails.value.status = ope
         }
 
         ElMessage.success('操作成功')
-        // 然后重新刷新一下页面
     }
 
 

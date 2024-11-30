@@ -179,9 +179,9 @@
     import { QuillEditor } from '@vueup/vue-quill'
     import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
-    //删除宣传功能
-    const deletePromote = async (promoteID: number) => {
-
+    // ——————————————————删除宣传功能——————————————————
+    const deletePromote = async (promoteID: number, event:any) => {
+        event.stopPropagation();  // 阻止触发行点击事件
         console.log("接收到的promoteID:" + promoteID)
 
         // 弹出确认框
@@ -201,6 +201,14 @@
         await viewMy()
     }
 
+    //——————————————————编辑宣传功能——————————————————
+    const editPromote = async (promoteID: number, event:any) => {
+        event.stopPropagation();  // 阻止触发行点击事件
+        console.log("用户编辑了宣传")
+    }
+
+
+    // ——————————————————发布宣传——————————————————
     import { Plus } from '@element-plus/icons-vue'
     //控制抽屉是否显示
     const visibleCreate = ref(false)
@@ -368,9 +376,10 @@
             <!-- 这一行只在查看我自己的宣传的时候显示 -->
             <el-table-column label="操作" width="100" v-if="isPromoter">
                 <template #default="{ row }">
-                    <el-button :icon="Edit" circle plain type="primary"></el-button>
+                    <el-button :icon="Edit" circle plain type="primary"
+                        @click="editPromote(row.promoteID, $event)"></el-button>
                     <el-button :icon="Delete" circle plain type="danger"
-                        @click="deletePromote(row.promoteID)"></el-button>
+                        @click="deletePromote(row.promoteID, $event)"></el-button>
                 </template>
             </el-table-column>
             <template #empty>

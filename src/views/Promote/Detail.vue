@@ -172,10 +172,12 @@
     // ——————————————————————接受/拒绝助力申请——————————————————————
     import { ElMessageBox } from 'element-plus';
     import { operateService } from '@/api/support'
-    const acceptSupport = async (supportID:number) => {
+    const acceptSupport = async (supportID:number, event:any) => {
+        event.stopPropagation();  // 阻止触发行点击事件
         operateSupport(supportID,1)
     }
-    const denySupport = async (supportID:number) => {
+    const denySupport = async (supportID:number, event:any) => {
+        event.stopPropagation();  // 阻止触发行点击事件
         operateSupport(supportID,2)
     }
 
@@ -200,7 +202,6 @@
     }
 
     // ——————————————————————展示助力详情——————————————————————
-    
     import { useSupportStore } from '@/stores/SupportStore';
     const supportStore = useSupportStore()
     const showDetails = (row: any) => {
@@ -332,9 +333,9 @@
                     <template #default="{ row }">
                         <div v-if="row.status == 0">
                             <el-button :icon="Check" circle plain type="primary"
-                                @click="acceptSupport(row.supportID)"></el-button>
+                                @click="acceptSupport(row.supportID, $event)"></el-button>
                             <el-button :icon="Close" circle plain type="danger"
-                                @click="denySupport(row.supportID)"></el-button>
+                                @click="denySupport(row.supportID, $event)"></el-button>
                         </div>
                         <div v-else-if="row.status == 1">
                             助力成功
