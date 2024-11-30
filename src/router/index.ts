@@ -5,6 +5,7 @@ import Home from '../views/Home.vue'
 import Promote from '../views/Promote/Promote.vue'
 import PromoteDetail from '../views/Promote/Detail.vue'
 import Support from '../views/Support/Support.vue'
+import SupportDetail from '../views/Support/Detail.vue'
 import UserBasis from '../views/User/Basis.vue'
 import ResetPsw from '../views/User/ResetPsw.vue'
 
@@ -29,13 +30,18 @@ const router = createRouter({
         },
         {
           path: '/promoteDetail',
-          name: 'detail',
+          name: 'promoteDetail',
           component: PromoteDetail,
         },
         {
           path: '/support',
           name: 'support',
           component: Support,
+        },
+        {
+          path: '/supportDetail',
+          name: 'supportDetail',
+          component: SupportDetail,
         },
         {
           path: '/user/basis',

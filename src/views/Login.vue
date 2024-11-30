@@ -107,7 +107,7 @@
 
     import { useRouter } from 'vue-router'
     const router = useRouter()
-    import { useTokenStore } from '@/stores/token';
+    import { useTokenStore } from '@/stores/tokenStore';
     const tokenStore = useTokenStore()
     import { useUserStore } from '@/stores/UserStore';
     const userStore = useUserStore()

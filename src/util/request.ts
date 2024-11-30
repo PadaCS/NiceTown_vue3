@@ -14,7 +14,7 @@ const instance: AxiosInstance = axios.create({
 });
 
 
-import { useTokenStore } from '@/stores/token';
+import { useTokenStore } from '@/stores/tokenStore';
 
 //添加请求拦截器
 instance.interceptors.request.use(

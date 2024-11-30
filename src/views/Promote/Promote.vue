@@ -248,7 +248,7 @@
     // ———————————————————————————————————————————————————————————
     // —————————————————————————文件上传功能———————————————————————
     // ———————————————————————————————————————————————————————————
-    import { useTokenStore } from '@/stores/token';
+    import { useTokenStore } from '@/stores/tokenStore';
     const tokenStore = useTokenStore()
 
     // —————————————————————————图片上传—————————————————————————
@@ -310,7 +310,7 @@
     // ———————————————————————————————————————————————————————————
     import { useRouter } from 'vue-router'
     const router = useRouter()
-    import { usePromoteStore } from '@/stores/Promote';
+    import { usePromoteStore } from '@/stores/PromoteStore';
     const promoteStore = usePromoteStore()
     import { useUserStore } from '@/stores/UserStore';
     const userStore = useUserStore()

@@ -19,7 +19,6 @@ export const viewMyService = () => {
 export const createSupportService = (
     support: Record<string, any>
 ): Promise<any> => {
-    console.log("发送PUT请求的support参数2：" + support)
     const result = request.put('/support/create', support)
     console.log("发布助力申请：", result )
     return result;

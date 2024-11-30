@@ -9,7 +9,7 @@
     // ————————————————————————————————————————————————————
     // —————————————————————数据初始化——————————————————————
     // ————————————————————————————————————————————————————
-    import { usePromoteStore } from '@/stores/Promote'
+    import { usePromoteStore } from '@/stores/PromoteStore'
     const promoteStore = usePromoteStore()
     const isPromoter = ref(promoteStore.isPromoter)
     console.log("isPromoter:" + isPromoter.value)
@@ -199,11 +199,25 @@
         await handleSupportData(); 
     }
 
+    // ——————————————————————展示助力详情——————————————————————
+    
+    import { useSupportStore } from '@/stores/SupportStore';
+    const supportStore = useSupportStore()
+    const showDetails = (row: any) => {
+        console.log("点击的行数据：",row)
+        supportStore.setSupport(row)
+        supportStore.setfromPage('/promoteDetail')
+        // 页面跳转
+        router.push('/supportDetail')
+
+    }
+    
+
     // ———————————————————————————————————————————————————————————
     // —————————————————————————文件上传功能———————————————————————
     // ———————————————————————————————————————————————————————————
     import { ElMessage } from 'element-plus';
-    import { useTokenStore } from '@/stores/token';
+    import { useTokenStore } from '@/stores/tokenStore';
     const tokenStore = useTokenStore()
 
     // —————————————————————————图片上传—————————————————————————
@@ -545,7 +559,7 @@
         width: 60%;
         padding: 10px;
         margin: 10px;
-        background-color: #4CAF50;
+        background-color: #6bc373;
         color: white;
         border: none;
         border-radius: 8px;
@@ -554,7 +568,7 @@
     }
 
     .support-btn:hover {
-        background-color: #45a049;
+        background-color: #3a7a3f;
     }
 
     /* 返回按钮样式 */
@@ -572,7 +586,7 @@
     }
 
     .back-btn:hover {
-        background-color: #0056b3;
+        background-color: #546f71;
     }
 
 
