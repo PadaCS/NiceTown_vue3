@@ -32,10 +32,9 @@
         supportStore.removeFromPage();
     };
     // ———————————————————————————————————————————————————————————
-    // ——————————————————————数据回显相关功能——————————————————————
+    // ————————————————————————助力内容回显————————————————————————
     // ———————————————————————————————————————————————————————————
     
-    // ——————————————————————助力内容回显——————————————————————
     // 这个页面永远显示的是pinia里存储的promote信息
 
     import type { Support } from '@/Types/types'
@@ -48,6 +47,47 @@
         videos: data.videos ? data.videos.split(',').map(vid => vid.trim()) : [],
         });
     
+    // ———————————————————————————————————————————————————————————
+    // ————————————————————接受/拒绝/删除助力申请———————————————————
+    // ———————————————————————————————————————————————————————————
+    import { ElMessageBox, ElMessage } from 'element-plus';
+    import { operateService, deleteService } from '@/api/support'
+    const acceptSupport = async () => {
+        operateSupport(1)
+    }
+    const denySupport = async () => {
+        operateSupport(2)
+    }
+
+    const deleteSupport = async () => {
+        operateSupport(3)
+    }
+
+    const operateSupport = async (ope:number) => { 
+        console.log("supportID:", supportDetails.value.supportID)
+        // 弹出确认框
+        await ElMessageBox.confirm(
+            '确定要接收/拒绝这条助力申请吗？',
+            '操作确认',
+            {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type:'info',
+            }
+        );
+
+        if(ope === 3){
+            await deleteService({supportID: supportDetails.value.supportID})
+            goBack()
+        }
+        else{
+            await operateService({promoteID: supportDetails.value.promoteID, supportID: supportDetails.value.supportID, operation: ope})
+        }
+
+        ElMessage.success('操作成功')
+        // 然后重新刷新一下页面
+    }
+
 
     
 </script>
@@ -93,9 +133,9 @@
     </div>
 
     <div class="operation" v-if="supportDetails.status === 0">
-        <button v-if="isPromoter === true" class="ope-button">接收</button>
-        <button v-if="isPromoter === true" class="ope-button">拒绝</button>
-        <button v-if="isSupporter === true" class="ope-button">删除</button>
+        <button v-if="isPromoter === true" class="ope-button" @click="acceptSupport">接收</button>
+        <button v-if="isPromoter === true" class="ope-button" @click="denySupport">拒绝</button>
+        <button v-if="isSupporter === true" class="ope-button" @click="deleteSupport">删除</button>
     </div>
     
 </template>

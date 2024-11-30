@@ -36,3 +36,10 @@ export const operateService = ( Data: Record<string, any> ) => {
         
     return request.put('/support/operate', params);
 }
+
+
+// 删除助力申请
+export const deleteService = ( params: {supportID: Number} ) => {
+    console.log("params:", params) 
+    return request.put('/support/delete', params);
+}
