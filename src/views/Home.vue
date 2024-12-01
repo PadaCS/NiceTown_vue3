@@ -6,10 +6,7 @@ import {
     Promotion,
     UserFilled,
     User,
-    Crop,
     EditPen,
-    SwitchButton,
-    CaretBottom
 } from '@element-plus/icons-vue'
 
 </script>

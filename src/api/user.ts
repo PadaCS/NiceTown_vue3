@@ -52,3 +52,23 @@ export const findUserByIDService = (ID:number[]) => {
 export const userInfoService = () => {
   return request.get('/user/userinfo');
 }
+
+// ———————————————————————————————————————————————————
+// ————————————————————修改用户信息————————————————————
+// ———————————————————————————————————————————————————
+export const updateService = (
+  params:{phonenumber: string, introduction: string}
+): Promise<any> => {
+  // console.log("发送PUT请求的userInfo参数：" + params.introduction + params.phonenumber)
+  return request.put('/user/update', params);
+}
+
+// ———————————————————————————————————————————————————
+// ————————————————————修改登陆密码————————————————————
+// ———————————————————————————————————————————————————
+export const passwordService = (
+  params:{OriginPsw: string, NewPsw: string}
+): Promise<any> => {
+  console.log("发送PUT请求的userInfo参数：" + params.OriginPsw + params.NewPsw)
+  return request.put('/user/changePsw', params);
+}
