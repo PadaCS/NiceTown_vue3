@@ -26,7 +26,7 @@
     // ——————————————————————数据回显相关功能——————————————————————
     // ———————————————————————————————————————————————————————————
 
-    import { promoteListService, townListService, viewMyService, deleteService, createPromoteService } from '@/api/promote'
+    import { promoteListService, townListService, viewMyService, deleteService, createPromoteService, updatePromoteService } from '@/api/promote'
     import type { Promote, Towns } from '@/Types/types'; // 定义 Promote 类型
 
     // 定义 promotes, towns, categorys 类型
@@ -201,12 +201,6 @@
         await viewMy()
     }
 
-    //——————————————————编辑宣传功能——————————————————
-    const editPromote = async (promoteID: number, event:any) => {
-        event.stopPropagation();  // 阻止触发行点击事件
-        console.log("用户编辑了宣传")
-    }
-
 
     // ——————————————————发布宣传——————————————————
     import { Plus } from '@element-plus/icons-vue'
@@ -252,6 +246,66 @@
         ElMessage.success('发布成功')
         visibleCreate.value = false
     }
+
+
+    //——————————————————编辑宣传功能——————————————————
+    // 初始化文件列表
+    const imageFileList = ref<Array<{ url: string }>>([]) // 图片文件列表
+    const videoFileList = ref<Array<{ url: string }>>([]) // 视频文件列表
+
+    const visibleEdit = ref(false)
+    const editPromote = async (row: any, event:any) => {
+        event.stopPropagation();  // 阻止触发行点击事件
+        visibleEdit.value = true
+
+        // 数据初始化
+        console.log("row:", row)
+        PromoteModel.value = row
+        console.log("PromoteModel.value:", PromoteModel.value)
+
+        // ——————————————这两个列表是用来回显的——————————————
+        // 初始化图片文件列表
+        if (PromoteModel.value.images) {
+            console.log("\nPromoteModel.value.images:", PromoteModel.value.images)
+            imageFileList.value = PromoteModel.value.images.split(',').map(url => ({
+                url: url,  // 直接使用 URL 作为唯一标识
+            }))
+            console.log("\nimageFileList.value:", imageFileList.value)
+        }
+        // 初始化视频文件列表
+        if (PromoteModel.value.videos) {
+            console.log("\nPromoteModel.value.videos:", PromoteModel.value.videos)
+            videoFileList.value = PromoteModel.value.videos.split(',').map(url => ({
+                url: url,  // 直接使用 URL 作为唯一标识
+            }))
+            console.log("\nvideoFileList.value:", videoFileList.value)
+        }
+        
+        console.log("\nEditPromoteModel:", PromoteModel.value)   
+    }
+
+    // 定义 updatePromote 函数
+    const updatePromote = async() => {
+        console.log("PromoteModel.value：" + PromoteModel.value)
+        await updatePromoteService(PromoteModel.value)
+        ElMessage.success('修改成功')
+        visibleEdit.value = false
+        resetPromoteModel()
+    }
+
+    
+    // ——————————————重置表单数据——————————————
+    const resetPromoteModel = () => {
+    PromoteModel.value = {
+        townID: '',
+        townFullName: '',
+        promoteType: '', 
+        theme: '', 
+        description: '',
+        images: '',
+        videos: ''
+    };
+};
 
     // ———————————————————————————————————————————————————————————
     // —————————————————————————文件上传功能———————————————————————
@@ -311,7 +365,60 @@
         console.log("上传视频：" + result.data + "\nPromoteModel.value.videos:" + PromoteModel.value.videos);
     }
 
+    // —————————————————————————文件删除—————————————————————————
+    const handleImgRemove = ( file: any )=>{
+        console.log("删除的文件：", file); 
+        // const removedFileUrl = file.response?.data; // 获取被删除的文件链接
+        let removedFileUrl = ''
+        if(file.response?.data === undefined){
+            removedFileUrl = file.url
+        }else{
+            
+            removedFileUrl = file.response?.data
+        }
+        console.log("\nremovedFileUrl", removedFileUrl); 
+        if (!removedFileUrl) return;// 如果啥也没删除就直接return
 
+        // 拆分当前图片列表字符串为数组
+        let imagesArray = PromoteModel.value.images.split(',');
+        console.log("\n拆分当前图片列表字符串为数组imagesArray", imagesArray); 
+
+        // 从数组中删除被移除的链接
+        imagesArray = imagesArray.filter(url => url !== removedFileUrl);
+        console.log("\n从数组中删除被移除的链接imagesArray", imagesArray); 
+
+        // 重新组合图片链接字符串
+        PromoteModel.value.images = imagesArray.join(',');
+
+        ElMessage.info('图片已删除');
+        console.log("剩余图片链接：" + PromoteModel.value.images);
+    }
+
+    const handleVideoRemove = ( file: any )=>{
+        console.log("删除的文件：", file); 
+        // const removedFileUrl = file.response?.data; // 获取被删除的文件链接
+        let removedFileUrl = ''
+        if(file.response?.data === undefined){
+            removedFileUrl = file.url
+        }else{
+            
+            removedFileUrl = file.response?.data
+        }
+        console.log("\nremovedFileUrl", removedFileUrl); 
+        if (!removedFileUrl) return;
+
+        // 拆分当前视频列表字符串为数组
+        let videosArray = PromoteModel.value.videos.split(',');
+
+        // 从数组中删除被移除的链接
+        videosArray = videosArray.filter(url => url !== removedFileUrl);
+
+        // 重新组合视频链接字符串
+        PromoteModel.value.videos = videosArray.join(',');
+
+        ElMessage.info('视频已删除');
+        console.log("剩余视频链接：" + PromoteModel.value.videos);
+    }
 
     // ———————————————————————————————————————————————————————————
     // —————————————————————————详情页跳转———————————————————————
@@ -377,7 +484,7 @@
             <el-table-column label="操作" width="100" v-if="isPromoter">
                 <template #default="{ row }">
                     <el-button :icon="Edit" circle plain type="primary"
-                        @click="editPromote(row.promoteID, $event)"></el-button>
+                        @click="editPromote(row, $event)"></el-button>
                     <el-button :icon="Delete" circle plain type="danger"
                         @click="deletePromote(row.promoteID, $event)"></el-button>
                 </template>
@@ -393,8 +500,8 @@
             @current-change="onCurrentChange" style="margin-top: 20px; justify-content: flex-end" />
 
 
-        <!-- ——————————————————————抽屉—————————————————————— -->
-        <el-drawer v-model="visibleCreate" title="发布宣传" direction="rtl" size="50%">
+        <!-- ——————————————————————发布宣传抽屉—————————————————————— -->
+        <el-drawer v-model="visibleCreate" title="发布宣传" direction="rtl" size="50%" @close="resetPromoteModel">
             <!-- 发布宣传表单 -->
             <el-form :model="PromoteModel" label-width="100px">
                 <el-form-item label="宣传主题">
@@ -436,6 +543,7 @@
                         name="file"
                         :headers="{'Authorization':tokenStore.token}"
                         :on-success="uploadImageSuccess"
+                        :on-remove="handleImgRemove"
                     >
                         <el-icon class="avatar-uploader-icon">
                             <Plus />
@@ -463,6 +571,7 @@
                         name="file"
                         :headers="{'Authorization':tokenStore.token}"
                         :on-success="uploadVideoSuccess"
+                        :on-remove="handleVideoRemove"
                     >
                         <el-icon class="avatar-uploader-icon">
                             <Plus />
@@ -479,7 +588,98 @@
             </el-form>
         </el-drawer>
 
+
+        <!-- ——————————————————————编辑宣传抽屉—————————————————————— -->
+        <el-drawer v-model="visibleEdit" title="编辑宣传" direction="rtl" size="50%" @close="resetPromoteModel">
+            <!-- 发布宣传表单 -->
+            <el-form :model="PromoteModel" label-width="100px">
+                <el-form-item label="宣传主题">
+                    <el-input v-model="PromoteModel.theme" placeholder="请输入宣传主题"></el-input>
+                </el-form-item>
+                <el-form-item label="宣传类型">
+                    <el-select placeholder="请选择" v-model="PromoteModel.promoteType">
+                        <el-option v-for="c in categorys" :key="c.id" :label="c.categoryName" :value="c.categoryName">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="乡镇地点">
+                    <el-select placeholder="请选择" v-model="PromoteModel.townID">
+                        <el-option v-for="c in allTowns" :key="c.townID" :label="c.categoryName" :value="c.townID">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="宣传内容">
+                    <div class="editor">
+                        <quill-editor theme="snow" v-model:content="PromoteModel.description" contentType="html">
+                        </quill-editor>
+                    </div>
+                </el-form-item>
+                <!-- 上传图片功能 -->
+                <el-form-item label="请上传图片">
+                    <!-- 
+                        action: 服务器接口路径
+                        name: 上传文件的字段名
+                        on-success: 上传成功的回调函数
+                        list-type：设置文件列表的样式
+                    -->
+                    <el-upload 
+                        class="avatar-uploader" 
+                        :multiple="true"
+                        :auto-upload="true" 
+                        :before-upload="beforeImageUpload"
+                        action="/api/upload"
+                        list-type="picture-card"
+                        name="file"
+                        :headers="{'Authorization':tokenStore.token}"
+                        :on-success="uploadImageSuccess"
+                        :on-remove="handleImgRemove"
+                        v-model:file-list="imageFileList"
+                    >
+                        <el-icon class="avatar-uploader-icon">
+                            <Plus />
+                        </el-icon>
+                        <template #tip>
+                            <div class="el-upload__tip">仅支持 jpg/png/gif 文件，且不超过 50MB</div>
+                        </template>
+                    </el-upload>
+                </el-form-item>
+                
+                <!-- 上传/视频功能 -->
+                <el-form-item label="请上传视频">
+                    <!-- 
+                        action: 服务器接口路径
+                        name: 上传文件的字段名
+                        on-success: 上传成功的回调函数
+                        list-type：设置文件列表的样式
+                    -->
+                    <el-upload 
+                        class="avatar-uploader" 
+                        :multiple="true"
+                        :auto-upload="true" 
+                        :before-upload="beforeVideoUpload"
+                        action="/api/upload"
+                        name="file"
+                        :headers="{'Authorization':tokenStore.token}"
+                        :on-success="uploadVideoSuccess"
+                        :on-remove="handleVideoRemove"
+                        v-model:file-list="videoFileList"
+                    >
+                        <el-icon class="avatar-uploader-icon">
+                            <Plus />
+                        </el-icon>
+                        <template #tip>
+                            <div class="el-upload__tip">仅支持 mp4 文件，且不超过 50MB</div>
+                        </template>
+                    </el-upload>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="updatePromote">确认修改</el-button>
+                </el-form-item>
+            </el-form>
+        </el-drawer>
     </el-card>
+
 </template>
 
 <style lang="scss" scoped>

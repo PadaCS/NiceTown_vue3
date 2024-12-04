@@ -37,6 +37,15 @@ export const createPromoteService = (
   return request.put('/promote/create', promote)
 }
 
+
+// 修改宣传
+export const updatePromoteService = (
+  promote: Record<string, any>
+): Promise<any> => {
+  console.log("发送PUT请求的Promote参数：" + promote)
+  return request.put('/promote/update', promote)
+}
+
 // 根据宣传id匹配宣传数据
 export const findPromoteByIDService = (
   promoteID: number[]
