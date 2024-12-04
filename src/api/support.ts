@@ -24,6 +24,15 @@ export const createSupportService = (
     return result;
 }
 
+// 编辑助力申请
+export const updateSupportService = (
+    support: Record<string, any>
+): Promise<any> => {
+    const result = request.put('/support/update', support)
+    console.log("编辑助力申请请求数据：", result )
+    return result;
+}
+
 // 接受/拒绝助力申请
 export const operateService = ( Data: Record<string, any> ) => {
     const params = new URLSearchParams();

@@ -273,6 +273,61 @@
         console.log("上传视频：" + result.data + "\SupportModel.value.videos:" + SupportModel.value.videos);
     }
 
+    // —————————————————————————文件删除—————————————————————————
+    const handleImgRemove = ( file: any )=>{
+        console.log("删除的文件：", file); 
+        // const removedFileUrl = file.response?.data; // 获取被删除的文件链接
+        let removedFileUrl = ''
+        if(file.response?.data === undefined){
+            removedFileUrl = file.url
+        }else{
+            
+            removedFileUrl = file.response?.data
+        }
+        console.log("\nremovedFileUrl", removedFileUrl); 
+        if (!removedFileUrl) return;// 如果啥也没删除就直接return
+
+        // 拆分当前图片列表字符串为数组
+        let imagesArray = SupportModel.value.images.split(',');
+        console.log("\n拆分当前图片列表字符串为数组imagesArray", imagesArray); 
+
+        // 从数组中删除被移除的链接
+        imagesArray = imagesArray.filter(url => url !== removedFileUrl);
+        console.log("\n从数组中删除被移除的链接imagesArray", imagesArray); 
+
+        // 重新组合图片链接字符串
+        SupportModel.value.images = imagesArray.join(',');
+
+        ElMessage.info('图片已删除');
+        console.log("剩余图片链接：" + SupportModel.value.images);
+    }
+
+    const handleVideoRemove = ( file: any )=>{
+        console.log("删除的文件：", file); 
+        // const removedFileUrl = file.response?.data; // 获取被删除的文件链接
+        let removedFileUrl = ''
+        if(file.response?.data === undefined){
+            removedFileUrl = file.url
+        }else{
+            
+            removedFileUrl = file.response?.data
+        }
+        console.log("\nremovedFileUrl", removedFileUrl); 
+        if (!removedFileUrl) return;
+
+        // 拆分当前视频列表字符串为数组
+        let videosArray = SupportModel.value.videos.split(',');
+
+        // 从数组中删除被移除的链接
+        videosArray = videosArray.filter(url => url !== removedFileUrl);
+
+        // 重新组合视频链接字符串
+        SupportModel.value.videos = videosArray.join(',');
+
+        ElMessage.info('视频已删除');
+        console.log("剩余视频链接：" + SupportModel.value.videos);
+    }
+
 </script>
 
 <template>
@@ -354,7 +409,7 @@
         </div>
 
 
-        <!-- ——————————————————————抽屉—————————————————————— -->
+        <!-- ——————————————————————发布助力抽屉—————————————————————— -->
         <el-drawer v-model="visibleCreate" title="发布助力申请" direction="rtl" size="50%">
             <!-- 发布助力表单 -->
             <el-form :model="SupportModel" label-width="100px">
@@ -385,6 +440,7 @@
                         name="file"
                         :headers="{'Authorization':tokenStore.token}"
                         :on-success="uploadImageSuccess"
+                        :on-remove="handleVideoRemove"
                     >
                         <el-icon class="avatar-uploader-icon">
                             <Plus />
@@ -412,6 +468,7 @@
                         name="file"
                         :headers="{'Authorization':tokenStore.token}"
                         :on-success="uploadVideoSuccess"
+                        :on-remove="handleImgRemove"
                     >
                         <el-icon class="avatar-uploader-icon">
                             <Plus />

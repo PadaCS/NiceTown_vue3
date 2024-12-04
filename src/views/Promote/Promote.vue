@@ -296,16 +296,16 @@
     
     // ——————————————重置表单数据——————————————
     const resetPromoteModel = () => {
-    PromoteModel.value = {
-        townID: '',
-        townFullName: '',
-        promoteType: '', 
-        theme: '', 
-        description: '',
-        images: '',
-        videos: ''
+        PromoteModel.value = {
+            townID: '',
+            townFullName: '',
+            promoteType: '', 
+            theme: '', 
+            description: '',
+            images: '',
+            videos: ''
+        };
     };
-};
 
     // ———————————————————————————————————————————————————————————
     // —————————————————————————文件上传功能———————————————————————
