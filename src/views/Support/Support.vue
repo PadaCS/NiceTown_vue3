@@ -5,9 +5,18 @@ import { Edit, Delete } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 const router = useRouter(); // 获取router实例
 
+
 // ————————————————————————————————————————————————————
 // ——————————————————————数据回显———————————————————————
 // ————————————————————————————————————————————————————
+
+const onlyAccepted = ref(false)
+const viewAccepted = ()=> {
+    onlyAccepted.value = true
+}
+const viewAll = ()=> {
+    onlyAccepted.value = false
+}
 
 // ——————————————————————助力情况回显——————————————————————
 import { viewMyService } from '@/api/support'
@@ -49,13 +58,22 @@ const statusMap = {
 };
 
 import { computed } from 'vue';
-// 过滤掉已取消的助力并显示为中文。回显时调用这个filteredSupportInfo变量
+// 显示为中文（并过滤出已接受助力）。回显时调用这个filteredSupportInfo变量
 const filteredSupportInfo = computed(() => {
-    return supportInfo.value
+    if(onlyAccepted.value == true){
+        return supportInfo.value
+        .filter(support => support.status == 1)
         .map(support => ({
             ...support,
             statusString: statusMap[support.status as keyof typeof statusMap]  // 添加 statusString 字段
         }));
+    }else{
+        return supportInfo.value
+        .map(support => ({
+            ...support,
+            statusString: statusMap[support.status as keyof typeof statusMap]  // 添加 statusString 字段
+        }));
+    }
 });
 
 onMounted(async () => {
@@ -302,7 +320,17 @@ const handleVideoRemove = (file: any) => {
 <template>
     <!-- 助力情况区域 -->
     <div class="support-container">
-        <h2 class="support-title">我发布的全部助力</h2>
+
+        <!-- ——————————————————————顶部—————————————————————— -->
+        <div class="header">
+            <h2 class="support-title">我发布的全部助力</h2>
+            <div class="extra">
+                <el-button class="accepted-button" type="primary" @click="viewAll" v-if="onlyAccepted">查看全部</el-button>
+                <el-button class="accepted-button" type="primary" @click="viewAccepted" v-else>仅已接受</el-button>
+            </div>
+        </div>
+
+
         <!-- ——————————————————————助力列表—————————————————————— -->
         <el-table :data="filteredSupportInfo" style="width: 100%" @row-click="showDetails" class="supportList">
             <el-table-column label="序号" width="100" type="index" theme> </el-table-column>
@@ -358,7 +386,7 @@ const handleVideoRemove = (file: any) => {
                     <el-upload class="avatar-uploader" :multiple="true" :auto-upload="true"
                         :before-upload="beforeImageUpload" action="/api/upload" list-type="picture-card" name="file"
                         :headers="{ 'Authorization': tokenStore.token }" :on-success="uploadImageSuccess"
-                        :on-remove="handleVideoRemove">
+                        :on-remove="handleVideoRemove" v-model:file-list="imageFileList">
                         <el-icon class="avatar-uploader-icon">
                             <Plus />
                         </el-icon>
@@ -379,7 +407,7 @@ const handleVideoRemove = (file: any) => {
                     <el-upload class="avatar-uploader" :multiple="true" :auto-upload="true"
                         :before-upload="beforeVideoUpload" action="/api/upload" name="file"
                         :headers="{ 'Authorization': tokenStore.token }" :on-success="uploadVideoSuccess"
-                        :on-remove="handleImgRemove">
+                        :on-remove="handleImgRemove" v-model:file-list="videoFileList">
                         <el-icon class="avatar-uploader-icon">
                             <Plus />
                         </el-icon>
@@ -459,12 +487,80 @@ const handleVideoRemove = (file: any) => {
     overflow-y: auto;
     /* 当内容超出时显示滚动条 */
 }
+.support-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* 水平居中 */
+    height: 80vh;         /* 使其占满整个屏幕高度 */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;     /* 当内容超出时显示滚动条 */
+}
+
+.header {
+    display: flex;              /* 使用 flex 布局 */
+    justify-content: space-between; /* 确保标题和按钮分布两端 */
+    align-items: center;        /* 垂直居中 */
+    width: 100%;                /* 占满父容器宽度 */
+    margin-bottom: 20px;        /* 设置底部间距 */
+}
 
 .support-title {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: #333;
+    text-align: center;         /* 居中文本 */
+    font-size: 28px;            /* 增大字体 */
+    font-weight: 700;           /* 加粗 */
+    color: #333;                /* 基础深灰色 */
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1); /* 文字阴影，增加层次感 */
+    letter-spacing: 1px;        /* 字间距 */
+    line-height: 1.5;           /* 行高 */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    flex: 1;                    /* 占据剩余空间，确保按钮靠右 */
 }
+
+.extra {
+    display: flex;              /* 使用 flex 布局 */
+    justify-content: flex-end;  /* 将按钮内容右对齐 */
+    margin-top: 10px;
+}
+
+.el-button {
+    font-size: 14px;            /* 调整按钮字体 */
+    padding: 6px 20px;          /* 设置按钮内边距 */
+    margin-left: 10px;          /* 设置按钮间距 */
+    border-radius: 4px;         /* 增加按钮圆角 */
+    transition: all 0.3s ease;  /* 添加平滑过渡效果 */
+}
+
+.el-button[type="primary"] {
+    background-color: #409EFF; /* 主按钮背景色 */
+    border-color: #409EFF;     /* 主按钮边框色 */
+    color: white;              /* 字体颜色为白色 */
+}
+
+.el-button[type="primary"]:hover {
+    background-color: #66b1ff; /* 按钮悬停时的背景色 */
+    border-color: #66b1ff;     /* 悬停时的边框颜色 */
+}
+
+.accepted-button {
+    font-size: 14px;            /* 调整按钮字体 */
+    padding: 6px 20px;          /* 设置按钮内边距 */
+    border-radius: 4px;         /* 增加按钮圆角 */
+    transition: all 0.3s ease;  /* 平滑过渡效果 */
+}
+
+.accepted-button[type="primary"] {
+    background-color: #409EFF; /* 主按钮背景色 */
+    border-color: #409EFF;     /* 主按钮边框色 */
+    color: white;              /* 字体颜色为白色 */
+}
+
+.accepted-button[type="primary"]:hover {
+    background-color: #66b1ff; /* 悬停时的背景色 */
+    border-color: #66b1ff;     /* 悬停时的边框颜色 */
+}
+
+
 </style>
