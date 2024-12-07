@@ -95,3 +95,70 @@ const submitForm = async () => {
     </el-form>
   </div>
 </template>
+<style lang="scss" scoped>
+.user-info-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  //   display: flex;
+  //   flex-direction: column; /* 确保按钮容器能继承 */
+  //   align-items: center; /* 居中对齐 */
+}
+
+.page-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.user-info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 80%;
+  max-width: 500px;
+  /* 设置最大宽度 */
+  //   align-items: center;
+}
+
+// .submit-button {
+//   display: flex;
+//   justify-content: center; /* 居中显示提交按钮 */
+//   width: auto; /* 确保按钮宽度占满整个容器 */
+// }
+
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+.input-field {
+  max-width: 100%;
+  /* 让输入框根据父容器的宽度自适应 */
+  width: 100%;
+  /* 确保输入框填满父容器 */
+}
+
+
+.time-info {
+  display: flex;
+  justify-content: space-between;
+  /* 左右对齐 */
+  margin-top: 10px;
+  gap: 50px;
+}
+
+.time-left,
+.time-right {
+  font-size: 12px;
+  color: #999;
+}
+
+small {
+  display: block;
+}
+</style>
