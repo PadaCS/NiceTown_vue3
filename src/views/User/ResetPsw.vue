@@ -47,6 +47,7 @@ const formRef = ref(null);
 // 提交表单
 const submitForm = async () => {
   // 使用 formRef 来触发表单验证
+  // @ts-ignore
   formRef.value.validate((valid: boolean) => {
     if (valid) {
       // 如果验证通过，提交表单

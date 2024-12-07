@@ -39,6 +39,8 @@ const search = () => {
     console.log('搜索条件:', startYear.value, startMonth.value, endYear.value, endMonth.value, townID.value);
     // 把起止年月拼成：startMonth和endMonth（格式: YYYYMM）
     // ......
+    // startTime = ...
+    // endTime = ...
 
     // 执行搜索逻辑
     getStats()
@@ -50,7 +52,7 @@ const reset = () => {
     startMonth.value = 7;
     endYear.value = 2024;
     endMonth.value = 12;
-    townID.value = 0;
+    townID.value = null;
     console.log('表单已重置');
 };
 </script>
