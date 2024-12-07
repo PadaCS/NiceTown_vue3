@@ -475,21 +475,6 @@ const handleVideoRemove = (file: any) => {
 .support-container {
     display: flex;
     flex-direction: column;
-    // justify-content: center; /* 垂直居中 */
-    align-items: center;
-    /* 水平居中 */
-    height: 80vh;
-    /* 使其占满整个屏幕高度 */
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    /* 当内容超出时显示滚动条 */
-}
-.support-container {
-    display: flex;
-    flex-direction: column;
     align-items: center;  /* 水平居中 */
     height: 80vh;         /* 使其占满整个屏幕高度 */
     padding: 20px;

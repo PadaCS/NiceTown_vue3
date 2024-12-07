@@ -602,7 +602,7 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="乡镇地点">
+                <el-form-item label="乡镇地区">
                     <el-select placeholder="请选择" v-model="PromoteModel.townID">
                         <el-option v-for="c in allTowns" :key="c.townID" :label="c.categoryName" :value="c.townID">
                         </el-option>

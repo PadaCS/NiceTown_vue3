@@ -8,6 +8,7 @@ import Support from '../views/Support/Support.vue'
 import SupportDetail from '../views/Support/Detail.vue'
 import UserBasis from '../views/User/Basis.vue'
 import ResetPsw from '../views/User/ResetPsw.vue'
+import Statistic from '../views/Statistic.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +53,12 @@ const router = createRouter({
           path: '/user/resetpsw',
           name: 'resetpsw',
           component: ResetPsw,
+        },
+        
+        {
+          path: '/statistic',
+          name: 'statistic',
+          component: Statistic,
         },
       ]
     },

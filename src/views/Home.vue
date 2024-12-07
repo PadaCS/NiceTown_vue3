@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 //这些是用到的图标
 import {
     HelpFilled,
@@ -7,9 +6,11 @@ import {
     UserFilled,
     User,
     EditPen,
+    DataAnalysis,
 } from '@element-plus/icons-vue'
-
-
+import { ref } from 'vue';
+import { useUserStore } from '@/stores/UserStore';
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -50,6 +51,12 @@ import {
                         <span>重置密码</span>
                     </el-menu-item>
                 </el-sub-menu>
+                <el-menu-item index="/statistic" v-if="userStore.user?.userType == 'admin'">
+                    <el-icon>
+                        <DataAnalysis />
+                    </el-icon>
+                    <span>月统计数据</span>
+                </el-menu-item>
             </el-menu>
         </el-aside>
 
